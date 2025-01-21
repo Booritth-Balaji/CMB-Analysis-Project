@@ -578,7 +578,15 @@ class ILCInfo(object):
             for i in range(self.N_freqs):
                 # TODO: allow specification of nested or ring ordering (although will already work here if fits keyword ORDERING is present)
                 temp_map = hp.fitsfunc.read_map(self.freq_map_files[i], )
-                assert len(temp_map) <= self.N_pix, "input map at higher resolution than specified N_side"
+                
+                # 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+                ## ADDED PIECE OF CODE TO CONVERT HIGHER NSIDE MAPS TO THE DESIRED NSIDE
+                if (len(temp_map) > self.N_pix): 
+                    self.maps[i] = np.copy( hp.pixelfunc.ud_grade(temp_map, nside_out=self.N_side, order_out='RING', dtype=np.float64) )
+                # 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+
+                ## Also commented out the below line since that wont be an issue anymore 
+                # assert len(temp_map) <= self.N_pix, "input map at higher resolution than specified N_side" 
                 if (len(temp_map) == self.N_pix):
                     self.maps[i] = np.copy(temp_map)
                 elif (len(temp_map) < self.N_pix):
